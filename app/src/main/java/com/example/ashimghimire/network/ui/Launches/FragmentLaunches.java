@@ -26,7 +26,6 @@ public class FragmentLaunches extends Fragment {
     private InteractionListener listener;
     private FragmentLaunchesBinding launchesBinding;
 
-
     public static FragmentLaunches newInstance() {
         return new FragmentLaunches();
     }

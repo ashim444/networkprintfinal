@@ -20,13 +20,22 @@ import androidx.recyclerview.widget.RecyclerView;
 public class LaunchAdapter extends RecyclerView.Adapter<LaunchAdapter.ViewHolder> {
     private List<Launch> listLaunches = new ArrayList<>();
     private Context context;
+    private OnItemClickListener onItemClickListener;
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    public interface OnItemClickListener {
+        void getClickLunches(int position);
+    }
 
     public LaunchAdapter(Context context) {
         this.context = context;
     }
 
     @Override
-    public LaunchAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public LaunchAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ViewHolder((ListItemLaunchesBinding) DataBindingUtil
                 .inflate(LayoutInflater.from(parent.getContext()),
                         R.layout.list_item_launches, parent, false));
@@ -68,16 +77,6 @@ public class LaunchAdapter extends RecyclerView.Adapter<LaunchAdapter.ViewHolder
             super(itemLaunchesBinding.getRoot());
             this.itemLaunchesBinding = itemLaunchesBinding;
         }
-    }
-
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
-    }
-
-    private OnItemClickListener onItemClickListener;
-
-    public interface OnItemClickListener {
-        void getClickLunches(int position);
     }
 }
 

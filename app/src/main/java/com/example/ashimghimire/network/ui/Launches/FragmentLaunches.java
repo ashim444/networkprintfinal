@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 public class FragmentLaunches extends Fragment implements TextWatcher {
     private InteractionListener listener;
     private FragmentLaunchesBinding launchesBinding;
+    private LaunchAdapter adapter;
 
     public static FragmentLaunches newInstance() {
         return new FragmentLaunches();
@@ -50,10 +51,10 @@ public class FragmentLaunches extends Fragment implements TextWatcher {
         super.onViewCreated(v, savedInstanceState);
         Repository repository = new Repository();
         repository.storeInDataBase();
-        repository.setSaveListener(() -> generateLunchesList());
+        repository.setSaveListener(this::generateLunchesList);
     }
 
-    public void generateLunchesList() {
+    private void generateLunchesList() {
         launchesBinding.launchesSearch.addTextChangedListener(this);
         final List<Launch> list = SQLite.select()
                 .from(Launch.class)
@@ -62,7 +63,7 @@ public class FragmentLaunches extends Fragment implements TextWatcher {
                 .from(LaunchImages.class)
                 .queryList();
         launchesBinding.lunchesRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        LaunchAdapter adapter = new LaunchAdapter(getContext());
+        adapter = new LaunchAdapter(getContext());
         adapter.setListLaunches(list);
         launchesBinding.lunchesRecycler.setAdapter(adapter);
         adapter.setOnItemClickListener(position -> listener.navigateToDetails(list.get(position).getLunchesFlightNumber()));
@@ -80,17 +81,13 @@ public class FragmentLaunches extends Fragment implements TextWatcher {
     }
 
     @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
     @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-    }
+    public void onTextChanged(CharSequence s, int start, int before, int count) { }
 
     @Override
     public void afterTextChanged(Editable s) {
-
+        adapter.getFilter().filter(s.toString());
     }
 }

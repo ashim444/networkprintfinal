@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 
 import com.bumptech.glide.Glide;
 import com.example.ashimghimire.network.R;
@@ -12,17 +14,19 @@ import com.example.ashimghimire.network.model.Launch;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class LaunchAdapter extends RecyclerView.Adapter<LaunchAdapter.ViewHolder> {
+public class LaunchAdapter extends RecyclerView.Adapter<LaunchAdapter.ViewHolder> implements Filterable {
     private List<Launch> listLaunches = new ArrayList<>();
+    private List<Launch> copyLaunchList;
     private Context context;
     private OnItemClickListener onItemClickListener;
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+    void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 
@@ -30,13 +34,13 @@ public class LaunchAdapter extends RecyclerView.Adapter<LaunchAdapter.ViewHolder
         void getClickLunches(int position);
     }
 
-    public LaunchAdapter(Context context) {
+    LaunchAdapter(Context context) {
         this.context = context;
     }
 
     @Override
     public LaunchAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder((ListItemLaunchesBinding) DataBindingUtil
+        return new ViewHolder( DataBindingUtil
                 .inflate(LayoutInflater.from(parent.getContext()),
                         R.layout.list_item_launches, parent, false));
     }
@@ -57,8 +61,9 @@ public class LaunchAdapter extends RecyclerView.Adapter<LaunchAdapter.ViewHolder
         });
     }
 
-    public void setListLaunches(List<Launch> listLaunches) {
+    void setListLaunches(List<Launch> listLaunches) {
         this.listLaunches = listLaunches;
+        copyLaunchList = new ArrayList<>(listLaunches);
         notifyDataSetChanged();
     }
 
@@ -67,14 +72,43 @@ public class LaunchAdapter extends RecyclerView.Adapter<LaunchAdapter.ViewHolder
         return listLaunches.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         ListItemLaunchesBinding itemLaunchesBinding;
 
-        public ViewHolder(@NonNull ListItemLaunchesBinding itemLaunchesBinding) {
+        private ViewHolder(@NonNull ListItemLaunchesBinding itemLaunchesBinding) {
             super(itemLaunchesBinding.getRoot());
             this.itemLaunchesBinding = itemLaunchesBinding;
         }
     }
+
+    @Override
+    public Filter getFilter() {
+        return copyLaunchFilter;
+    }
+
+    private Filter copyLaunchFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<Launch> filterList = new ArrayList<>();
+
+            if (constraint == null || constraint.length() == 0) {
+                filterList.addAll(copyLaunchList);
+            } else {
+                String filterString = constraint.toString().toLowerCase().trim();
+                filterList = copyLaunchList.stream().filter(l -> l.getLunchesMissionName().toLowerCase().startsWith(filterString)).collect(Collectors.toList());
+            }
+            FilterResults results = new FilterResults();
+            results.values = filterList;
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            listLaunches.clear();
+            listLaunches.addAll((List) results.values);
+            notifyDataSetChanged();
+        }
+    };
 }
 
 

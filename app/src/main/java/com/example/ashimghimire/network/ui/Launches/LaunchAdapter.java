@@ -50,12 +50,9 @@ public class LaunchAdapter extends RecyclerView.Adapter<LaunchAdapter.ViewHolder
         Glide.with(context).load(currentLaunch.getLaunchImages()
                 .getLunchesSmallImageUrl()).placeholder(R.drawable.ic_launcher_background)
                 .into(holder.itemLaunchesBinding.itemLunchesImage);
-        holder.itemLaunchesBinding.getRoot().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (onItemClickListener != null) {
-                    onItemClickListener.getClickLunches(currentLaunch.getLunchesFlightNumber());
-                }
+        holder.itemLaunchesBinding.getRoot().setOnClickListener(v -> {
+            if (onItemClickListener != null) {
+                onItemClickListener.getClickLunches(currentLaunch.getLunchesFlightNumber());
             }
         });
     }

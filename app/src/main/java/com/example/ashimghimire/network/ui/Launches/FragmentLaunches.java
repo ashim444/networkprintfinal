@@ -2,6 +2,8 @@ package com.example.ashimghimire.network.ui.Launches;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +24,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-public class FragmentLaunches extends Fragment {
+public class FragmentLaunches extends Fragment implements TextWatcher {
     private InteractionListener listener;
     private FragmentLaunchesBinding launchesBinding;
 
@@ -48,15 +50,11 @@ public class FragmentLaunches extends Fragment {
         super.onViewCreated(v, savedInstanceState);
         Repository repository = new Repository();
         repository.storeInDataBase();
-        repository.setSaveListener(new Repository.iDataSaveListener() {
-            @Override
-            public void dataSaved() {
-                generateLunchesList();
-            }
-        });
+        repository.setSaveListener(() -> generateLunchesList());
     }
 
     public void generateLunchesList() {
+        launchesBinding.launchesSearch.addTextChangedListener(this);
         final List<Launch> list = SQLite.select()
                 .from(Launch.class)
                 .queryList();
@@ -67,12 +65,7 @@ public class FragmentLaunches extends Fragment {
         LaunchAdapter adapter = new LaunchAdapter(getContext());
         adapter.setListLaunches(list);
         launchesBinding.lunchesRecycler.setAdapter(adapter);
-        adapter.setOnItemClickListener(new LaunchAdapter.OnItemClickListener() {
-            @Override
-            public void getClickLunches(int position) {
-                listener.navigateToDetails(list.get(position).getLunchesFlightNumber());
-            }
-        });
+        adapter.setOnItemClickListener(position -> listener.navigateToDetails(list.get(position).getLunchesFlightNumber()));
     }
 
     @Override
@@ -84,5 +77,20 @@ public class FragmentLaunches extends Fragment {
             throw new RuntimeException() {
             };
         }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
     }
 }

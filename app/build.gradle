@@ -19,7 +19,11 @@ android {
     dataBinding {
         enabled = true
     }
-
+    // Keep the following configuration in order to target Java 8.
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 def dbflow_version = "4.0.3"
 dependencies {
